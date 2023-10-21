@@ -9,7 +9,12 @@
   background-color: rgba(255, 255, 255, 0.8);
   drop-filter: blur(10px);
 }
-
+.complete{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .cards {
   display: grid;

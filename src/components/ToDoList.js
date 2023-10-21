@@ -1,8 +1,9 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import localforage from "localforage";
-import { UilTrashAlt,UilEdit } from '@iconscout/react-unicons'
-
+import { UilTrashAlt,UilEdit,UilCheckCircle,UilCheck } from '@iconscout/react-unicons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheckDouble } from '@fortawesome/free-solid-svg-icons'
 
 
 const ToDoList = () => {
@@ -11,8 +12,13 @@ const ToDoList = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [updateTask, setUpdateTask] = useState("");
-  const [todo, setTodo] = useState([]);
-  const [error, setError] = useState('');
+  const [checked, setChecked] = useState(false);
+  const [todo, setTodo] = useState([
+    {"id":1, "title":"task1", "description":"my description", "status":false},
+    {"id":2, "title":"task1", "description":"my description", "status":false}
+  ]);
+  
+ 
 
 
   // Load tasks from local storage when the component mounts
@@ -121,6 +127,18 @@ const ToDoList = () => {
     }
   };
 
+  const markDone = (id) => {
+    const newTasks = todo.map((task) => {
+      if (task.id === id){
+        return ({ ...task, status: !task.status, checked: !task.checked })
+      }
+      
+      return task;
+    });
+    setTodo(newTasks);
+    setChecked(!checked);
+  }
+
   return (
     <div className="px-8 pt-4 container mb-8 ">
       <div className="flex flex-col items-center justify-center py-8 gap-4 todolist mb-8">
@@ -150,11 +168,29 @@ const ToDoList = () => {
               <React.Fragment key={task.id}>
                 <div className="card-box rounded p-4 bg-white flex flex-col justify-between items-start gap-4">
                   <h1 className="font-bold text-center">Task : {index + 1}</h1>
-                  <div className="flex flex-col items-start justify-between gap-5">
-                  <h1 className="font-medium">Task : {task.title}</h1>
-                  <p className="text-gray-600"><span className="text-black">About task : </span>{task.description}</p>
+
+                  
+
+                  <div className="flex flex-col items-start justify-between gap-5 ">
+                  <h1 className={`font-medium ${task.status ? 'line-through' : ''}`}>Task : {task.title}</h1>
+                  <p className={`text-gray-600 ${task.status ? 'line-through' : ''}`}><span className="text-black">About task : </span>{task.description}</p>
                   </div>
+                  {task.status && <div className="text-center complete"><FontAwesomeIcon icon={faCheckDouble} className="text-green-500 transition-all" /><br/><span className="ml-2 text-gray-600">Task completed</span></div>}
+
+                  
+
                   <div className="btns flex items-center justify-end  gap-4 text-xl">
+                  <button 
+                  onClick={(e) => markDone(task.id)}
+                  title="Completed / Not Completed"
+                >
+                  <UilCheckCircle checked={task.checked}
+          style={
+            task.checked ? {'backgroundColor' :'green', 'borderRadius' : '50%', 'color' : 'white' }: {'backgroundColor' : '#fff'}
+          }/>
+                </button>
+                {!task.status && (
+    
                     <button className="text-5xl"
                       onClick={() => {
                         UpdateModal();
@@ -168,6 +204,7 @@ const ToDoList = () => {
                     >
                      <UilEdit className="text-5xl" />
                     </button>
+                )}
                     <button onClick={() => deleteTask(task.id)} title="Delete">
                     <UilTrashAlt />
                     </button>
